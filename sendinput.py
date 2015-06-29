@@ -107,7 +107,7 @@ def sendinput():
 		ip.type_input.ki.dwFlags = DWORD(2)
 		ctypes.windll.User32.SendInput(UINT(1), byref(ip), c_int(ctypes.sizeof(ip)))
 		
-		sleep(0.03)
+		sleep(0.1)
 		
 		# Enter
 		ip.type_input.ki.wVk = WORD(13)
@@ -119,7 +119,7 @@ def sendinput():
 		ip.type_input.ki.dwFlags = DWORD(2)
 		ctypes.windll.User32.SendInput(UINT(1), byref(ip), c_int(ctypes.sizeof(ip)))
 		
-		sleep(0.03)
+		sleep(0.1)
 	
 		# Enter
 		ip.type_input.ki.wVk = WORD(13)
@@ -131,7 +131,7 @@ def sendinput():
 		ip.type_input.ki.dwFlags = DWORD(2)
 		ctypes.windll.User32.SendInput(UINT(1), byref(ip), c_int(ctypes.sizeof(ip)))
 		
-		sleep(0.03)
+		sleep(0.1)
 		
 callback = callback_proto(EnumWindowsCallback)
 	

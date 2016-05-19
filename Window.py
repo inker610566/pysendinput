@@ -1,7 +1,6 @@
 import ctypes
 from ctypes import c_int, c_wchar_p, WINFUNCTYPE, windll, create_string_buffer, byref
 from ctypes import Structure, Union, cast, POINTER
-from ctypes.wintypes import HWND
 from ctypes.wintypes import HWND, LPCSTR, UINT, LPARAM, BOOL, LONG, WORD, DWORD, LPVOID
 from ctypes import cdll
 import re
@@ -24,6 +23,25 @@ class Window:
         ctypes.windll.User32.SetForegroundWindow(self.hwnd)
         ctypes.windll.User32.ShowWindow(self.hwnd, c_int(10))
 
+    def GetPixel(self, x, y):
+        dc = ctypes.windll.User32.GetDC(self.hwnd)
+        rgb = ctypes.windll.Gdi32.GetPixel(dc, x, y)
+        ctypes.windll.User32.ReleaseDC(self.hwnd, dc)
+        return (rgb&0xFF, ((rgb>>8)&0xFF), ((rgb>>16)&0xFF))
+
+    def GetWidth(self):
+        dc = ctypes.windll.User32.GetDC(self.hwnd)
+        w = ctypes.windll.Gdi32.GetDeviceCaps(dc, 8)
+        ctypes.windll.User32.ReleaseDC(self.hwnd, dc)
+        return w
+
+    def GetHeight(self):
+        dc = ctypes.windll.User32.GetDC(self.hwnd)
+        h = ctypes.windll.Gdi32.GetDeviceCaps(dc, 10)
+        ctypes.windll.User32.ReleaseDC(self.hwnd, dc)
+        return h
+
+
 class EnumWinResult(Structure):
     _fields_ = [
         ("subname", c_wchar_p),
@@ -35,7 +53,7 @@ def FindWindowByName(subname):
     :Args:
         - subname: find windows title contain subname
     :Returns:
-        - Window object
+        - None if not found else Window object
     '''
     # https://msdn.microsoft.com/zh-tw/library/windows/desktop/ms633497(v=vs.85).aspx
     WNDENUMPROC = WINFUNCTYPE(BOOL, HWND, LPARAM)
@@ -52,8 +70,6 @@ def _EnumWindowsCallback(hwnd, lparam):
     ctypes.windll.User32.GetWindowTextA(hwnd, byref(p), WINDOW_NAME_LENGTH)
     rp = cast(lparam, POINTER(EnumWinResult))
     subname = rp.contents.subname
-    #print(p.value)
-    #print(subname)
     p = p.value.decode(os_encoding)
     if p.find(subname) != -1:
         rp.contents.hwnd = hwnd

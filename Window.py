@@ -1,7 +1,7 @@
 import ctypes
 from ctypes import c_int, c_wchar_p, WINFUNCTYPE, windll, create_string_buffer, byref
-from ctypes import Structure, Union, cast, POINTER
-from ctypes.wintypes import HWND, LPCSTR, UINT, LPARAM, BOOL, LONG, WORD, DWORD, LPVOID
+from ctypes import Structure, cast, POINTER
+from ctypes.wintypes import HWND, LPARAM, BOOL, RECT
 from ctypes import cdll
 import re
 
@@ -31,16 +31,19 @@ class Window:
 
     def GetWidth(self):
         dc = ctypes.windll.User32.GetDC(self.hwnd)
-        w = ctypes.windll.Gdi32.GetDeviceCaps(dc, 8)
+        r = RECT()
+        #ctypes.windll.User32.GetWindowRect(self.hwnd, byref(r))
+        ctypes.windll.User32.GetClientRect(self.hwnd, byref(r))
         ctypes.windll.User32.ReleaseDC(self.hwnd, dc)
-        return w
+        return r.right-r.left
 
     def GetHeight(self):
         dc = ctypes.windll.User32.GetDC(self.hwnd)
-        h = ctypes.windll.Gdi32.GetDeviceCaps(dc, 10)
+        r = RECT()
+        #ctypes.windll.User32.GetWindowRect(self.hwnd, byref(r))
+        ctypes.windll.User32.GetClientRect(self.hwnd, byref(r))
         ctypes.windll.User32.ReleaseDC(self.hwnd, dc)
-        return h
-
+        return r.bottom-r.top
 
 class EnumWinResult(Structure):
     _fields_ = [
